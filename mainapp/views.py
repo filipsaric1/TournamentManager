@@ -65,10 +65,7 @@ def register(request):
                 settings.EMAIL_HOST_USER,
                 to=[user.email]
             )
-            try:
-                email_message.send()
-            except:
-                user.delete()
+            user.delete()
             return render(request, 'auth/activationNote.html', {'type': 'sent'})
         else:
             return render(request, 'auth/register.html', {'form':userForm})

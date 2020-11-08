@@ -27,7 +27,7 @@ class User(AbstractUser):
     image = models.ImageField(upload_to='profiles/', default='/profiles/default_img.jpg', blank=False, null=False)
     registered = models.DateTimeField(auto_now=True)
     reputation = models.ForeignKey(Reputation, on_delete=models.CASCADE, null=True, blank=True )
-    is_active = models.BooleanField(default = True)
+    is_active = models.BooleanField(default = False)
 
 class GroupPhase(models.Model):
     num_of_groups = models.IntegerField()
