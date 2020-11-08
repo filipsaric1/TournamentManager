@@ -21,7 +21,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '#&uu$r*df-fmal8k$2kpu+*#w%^4mcg)my(9^p2s2y&u*wl9^9'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -170,9 +170,9 @@ DATETIME_INPUT_FORMATS = (
 LOGOUT_REDIRECT_URL = '/'
 TIME_ZONE='Europe/Zagreb'
 
-EMAIL_HOST='smtp.gmail.com'
-EMAIL_HOST_USER='tournamentmanagerapp@gmail.com'
-EMAIL_HOST_PASSWORD='tournamentmanager123'
+EMAIL_HOST=os.getenv('EMAIL_HOST')
+EMAIL_HOST_USER=os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD=os.getenv('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS=True
-EMAIL_PORT=587
+EMAIL_PORT=os.getenv('EMAIL_HOST_PORT')
 django_heroku.settings(locals())
