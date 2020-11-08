@@ -1165,7 +1165,8 @@ def finishTournament(request, tid):
 @admin_required
 def teams(request):
     teams = Team.objects.all() or None
-    teams = [team for team in teams if team.owner]
+    if teams != None:
+        teams = [team for team in teams if team.owner]
     return render(request, 'admin/teams.html', {'teams': teams})
 
 @login_required(login_url='/login')
