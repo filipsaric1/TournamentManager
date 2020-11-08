@@ -283,7 +283,7 @@ def profile(request):
         userData = UserEditForm(instance = request.user)
         commentsNum = Comment.objects.filter(user = request.user).count()
         teamsNum = Team.objects.filter(owner = request.user).count()
-        reputation = Reputation.objects.get(user = request.user)
+        reputation = Reputation.objects.get(user = request.user) or None
         passChangeForm = PasswordChangeForm(request.user)
         return render(request, 'profile.html', {'teams': Team.objects.filter(owner = request.user), 'reputation': reputation,'passChangeForm': passChangeForm,'form': userData, 'user':request.user, 'teamsNum': teamsNum, 'commentsNum': commentsNum})
     elif request.method == 'POST':
