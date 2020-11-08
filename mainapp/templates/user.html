@@ -1,0 +1,148 @@
+{% extends 'base.html' %} {%block content%}
+<style>
+    p>strong {
+        margin-right: 6%;
+    }
+    
+    .col p {
+        margin: 2px 0 0 0;
+    }
+    
+    .playerFormMain {
+        background-color: #FFFFFF;
+        width: 310px;
+        height: auto;
+        border-radius: 1.5em;
+        box-shadow: 0px 11px 35px 2px rgba(0, 0, 0, 0.14);
+        padding-bottom: 30px;
+        margin-left: 80px;
+        margin-top: 10px;
+        margin: 10px 0 0 60px;
+    }
+    
+    .submit {
+        cursor: pointer;
+        border-radius: 5em;
+        color: #fff;
+        background-color: dodgerblue;
+        border: 0;
+        padding-left: 40px;
+        padding-right: 40px;
+        padding-bottom: 10px;
+        padding-top: 10px;
+        font-family: 'Ubuntu', sans-serif;
+        margin-left: 35%;
+        font-size: 13px;
+        box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
+    }
+    
+    .submit:disabled {
+        cursor: none;
+    }
+    
+    #id_filelabel,
+    #id_name,
+    #id_surname,
+    #id_old_password,
+    #id_new_password1,
+    #id_new_password2,
+    #id_role {
+        width: 76%;
+        color: rgb(38, 50, 56);
+        font-weight: 700;
+        font-size: 14px;
+        letter-spacing: 1px;
+        background: rgba(136, 126, 126, 0.04);
+        padding: 10px 20px;
+        border: none;
+        border-radius: 20px;
+        outline: none;
+        box-sizing: border-box;
+        border: 2px solid rgba(0, 0, 0, 0.02);
+        margin-bottom: 50px;
+        margin-left: 46px;
+        text-align: center;
+        margin-bottom: 27px;
+        font-family: 'Ubuntu', sans-serif;
+    }
+    
+    #id_image {
+        display: none;
+    }
+    
+    p>strong {
+        margin-right: 6%;
+    }
+    
+    .col p {
+        margin: 2px 0 0 0;
+    }
+</style>
+<div class="card shadow mb-4" style="width: 70%; margin:auto;">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Info</h6>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col auto"><img src="{{user.image.url}}" style=" display: block;
+                margin-left: auto;
+                margin-right: auto;
+                width: 200px;">
+            </div>
+            <div class="col auto;">
+                <hr>
+                <strong style="font-size: 18px;"> USER DATA </strong>
+                <hr>
+                <p><strong>Username: </strong> {{user.username}}</p>
+                <p><strong>E-mail: </strong> {{user.email}}</p>
+                <p><strong>Name: </strong> {{user.name}}</p>
+                <p><strong>Surname: </strong> {{user.surname}}</p>
+                {%if request.user.role == "A"%}
+                <p><a href="#" data-toggle="modal" data-target="#changeUserData">
+                    update info
+                </a>
+                    <div class="modal fade" id="changeUserData" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Change your profile data</h5>
+                                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                      </button>
+                                </div>
+                                <div style="padding: 5% 0 5% 0;">
+                                    <form method="POST" enctype='multipart/form-data'>
+                                        <label id="id_filelabel" for="id_image" style="display: inline-block; cursor: pointer;">change image</label><img style="margin:0 0 8% 25%; max-width: 50%;;" src="{{user.image.url}}"><br> {{form.image}} {{form.name}}
+                                        {{form.surname}} {{form.role}} {%csrf_token%}
+                                        <input type="submit" class="submit" align="center" value="Enter">
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {%endif%}
+            </div>
+            <div class="col auto;">
+                <hr>
+                <strong style="font-size: 18px;"> USER STATISTICS </strong>
+                <hr>
+                <p><i class="fas fa-comment"> </i> {{commentsNum}} comments</p>
+                <p><i class="fas fa-thumbs-up"> </i> {{reputation.points}} reputation</p>
+                <p><i class="fas fa-futbol"> </i> {{teamsNum}} teams owned</p>
+                <p><i class="fas fa-calendar-alt"> </i> Registered at {{request.user.registered}} </p>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{%if request.user.role == "A"%}
+<script>
+    function placeHolder() {
+        document.getElementById("id_name").placeholder = "Name";
+        document.getElementById("id_surname").placeholder = "Surname";
+    }
+    window.addEventListener("load", placeHolder, false);
+</script>
+{%endif%} {%endblock%}

@@ -1,0 +1,1 @@
+{% autoescape off %} Hi {{user.username}}, you can change your password by clicking on the link below. http://{{domain}}{%url 'verifyReset' uidb64=uid token=token %} {% endautoescape %}

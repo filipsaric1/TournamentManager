@@ -1,0 +1,28 @@
+{%block content%}
+<style>
+    body {
+        font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    }
+</style>
+
+<head>
+    {%load static%}
+    <link href="{% static "/css/bs-styles.css "%}" rel="stylesheet">
+</head>
+
+
+<body>
+    {%if type == "sent" %}
+    <div class="text-center">
+        <p class="lead text-gray-800 mb-5">E-mail sent</p>
+        <p class="text-gray-500 mb-0">We sent an activation link to your mail.</p>
+    </div>
+    {%else%}
+    <div class="text-center">
+        <p class="lead text-gray-800 mb-5">Account Activated!</p>
+        <p class="text-gray-500 mb-0">You have successfully acivated your account.</p>
+        <a href="/login">&larr; Log in to your account.</a>
+    </div>
+    {%endif%}
+</body>
+{%endblock%}

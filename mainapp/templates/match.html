@@ -1,0 +1,100 @@
+{%extends 'base.html'%} {%block content%} {%if match.team1 and match.team2%}
+<div class="results">
+    <div class="container" style="margin: auto !important;">
+        <div class=" row results_row ">
+            <div class="col ">
+                <div class="results_title_container text-center ">
+                    {%if match.group%}
+                    <div class="results_title">Match Info {% if not match.isPlayed and request.user.role == "C" or request.user.role == "A" and not match.isPlayed%}{%if playable%}<small><a href="/finishMatch/{{match.id}}" class="btn btn-success btn-icon-split">
+                        <span class="icon text-white-50">
+                          <i class="fas fa-check"></i>
+                        </span>
+                        <span class="text" style="background: inherit !important;">Finish Match</span>
+                    </a>{%endif%}{%endif%}
+                    </div>
+                    {%else%}
+                    <div class="results_title">Match Info {% if finishable and playable%}<small>
+                        <a href="/finishMatch/{{match.id}}" class="btn btn-success btn-icon-split">
+                            <span class="icon text-white-50">
+                            <i class="fas fa-check"></i></span>
+                            <span class="text" style="background: inherit !important;">Finish Match</span>
+                        </a>{%endif%}
+                    </div>
+                    {%endif%}
+                    <div class="results_subtitle ">{%if match.date and playable%}{{match.date}}{%endif%}</div>
+                    <div class="results_subtitle ">{%if not playable and match.date%}Match starts at {{match.date}}{%endif%}</div>
+                    <div class="results_subtitle ">{%if not match.date%}Match date has not been set yet.{%endif%}</div>
+                </div>
+                <div class="results_container d-flex flex-row align-items-start justify-content-start ">
+                    <div class="result text-right ">
+                        <div class="result_content d-flex flex-row align-items-end justify-content-start ">
+                            <div class="team_image d-flex flex-column align-items-start justify-content-end "><img src="{{match.team1.image.url}} " alt=" " style="width: 100%;" onerror="this.onerror=null; this.src='https://media.contentapi.ea.com/content/dam/ea/fifa/fifa-20/common/fut-features/fut20-hero-medium-keyart-2x1-m.png.adapt.crop191x100.1200w.png'"></div>
+                            <div class="text-center ">
+                                {%if match.isPlayed or match.team1_goals != 0 or match.team2_goals != 0  %}<div class="result_num ">{{match.team1_goals}}</div> {%else%}<div class="result_num ">-</div>{%endif%}
+                                <a href="/othTeam/{{match.team1.id}}"><div class="result_team ">{{match.team1.name}}</div></a>
+                            </div>
+                        </div>
+                        <div class="result_text text-left">
+                            {%for scorer in team1Scorers%} <span class="minleft"> <a href="/playerProfile/{{scorer.player.id}}">{{scorer.minute}}</span>' {{scorer.player.name}} {{scorer.player.lastname}} </a> {%if not match.isPlayed%} <a href="/deleteScorer/{{scorer.id}}"><i class="fas fa-trash"></i></a>{%endif%}<br>                            {%endfor%}
+                            <div class="card-body">
+                                {%if not match.isPlayed and playable%} ADD GOALSCORER: Select player and the minute he scored.
+                                <form method="POST" enctype='multipart/form-data' action='/addScorer/{{match.id}}' style="padding-top: 5px;">
+                                    {{team1Form.player}} {{team1Form.minute}} {% csrf_token %}
+                                    <input type="submit" value="Enter " class="btn btn-primary">
+                                </form>
+                                {%endif%}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="result text-left ">
+                        <div class="result_content d-flex flex-row align-items-end justify-content-start ">
+                            <div class="text-center ">
+                                {%if match.isPlayed or match.team2_goals != 0 or match.team1_goals != 0%}<div class="result_num ">{{match.team2_goals}}</div> {%else%}<div class="result_num ">-</div>{%endif%}
+                                <a href="/othTeam/{{match.team2.id}}"><div class="result_team ">{{match.team2.name}}</div></a>
+                            </div>
+                            <div class="team_image d-flex flex-column align-items-end justify-content-end "><img src="{{match.team2.image.url}}" style="width: 100%;" alt=" " onerror="this.onerror=null; this.src='https://media.contentapi.ea.com/content/dam/ea/fifa/fifa-20/common/fut-features/fut20-hero-medium-keyart-2x1-m.png.adapt.crop191x100.1200w.png'"></div>
+                        </div>
+                        <div class="result_text text-right ">
+                            {%for scorer in team2Scorers%} <span class="minright"><a href="/playerProfile/{{scorer.player.id}}">{{scorer.minute}}'</span> {{scorer.player.name}} {{scorer.player.lastname}} </a>{%if not match.isPlayed%} <a href="/deleteScorer/{{scorer.id}}"><i class="fas fa-trash"></i></a>{%endif%}<br> <br> {%endfor%} {%if not match.isPlayed and playable%}ADD GOALSCORER: Select player and the minute he scored.
+                            <form method="POST" enctype='multipart/form-data' action='/addScorer/{{match.id}}' style="padding-top: 5px; ">
+                                {{team2Form.player}} {{team2Form.minute}} {% csrf_token %}
+                                <input type="submit" value="Enter " class="btn btn-primary ">
+                            </form>
+                            {%endif%}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{%else%}
+<h2>Info not available</h2>
+{%endif%}
+                <script>
+                    window.addEventListener('load', function() {
+                        document.querySelectorAll('input[id=id_minute]')[0].className = 'form-control';
+                        document.querySelectorAll('input[id=id_minute]')[1].className = 'form-control';
+                        document.querySelectorAll('input[id=id_minute]')[0].style.margin = '5px 0 5px 0';
+                        document.querySelectorAll('input[id=id_minute]')[1].style.margin = '5px 0 5px 0';
+                        document.querySelectorAll('select[id=id_player]')[0].className = 'form-control';
+                        document.querySelectorAll('select[id=id_player]')[1].className = 'form-control';
+                        document.querySelectorAll('input[id=id_minute]')[1].setAttribute('min', 1);
+                        document.querySelectorAll('input[id=id_minute]')[0].setAttribute('min', 1)
+                        document.querySelectorAll('input[id=id_minute]')[1].setAttribute('max', 90);
+                        document.querySelectorAll('input[id=id_minute]')[0].setAttribute('max', 90)
+                        var results1 = document.getElementsByClassName("minleft");
+                        if (results1.length != 0) {
+                            var ind = results1.length - 1;
+                            document.querySelectorAll('input[id=id_minute]')[0].setAttribute('min', parseInt(results1[ind].textContent));
+                        }
+                        var results2 = document.getElementsByClassName("minright");
+                        if (results2.length != 0) {
+                            var ind = results2.length - 1;
+                            document.querySelectorAll('input[id=id_minute]')[1].setAttribute('min', parseInt(results2[ind].textContent));
+                        }
+                    }, false)
+                </script>
+                {%endblock%}

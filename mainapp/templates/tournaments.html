@@ -1,0 +1,130 @@
+{%extends 'base.html'%} {%block content%}
+<div class="container-fluid">
+    <!-- Page Heading -->
+
+    <h1 class="h3 mb-4 text-gray-800">Active Tournaments</h1>
+</div>
+<div class="row">
+    {%if activeTournaments%} {%for tournament in activeTournaments%}
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <a href="/tournament/{{tournament.id}}">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">{%if tournament.type == "G&E"%} GROUP AND ELIMINATION {%else%} {{tournament.type}} {%endif%}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{tournament.name}}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-trophy fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+    {%endfor%} {%else%}
+    <p>Currently there is no active tournaments.</p>
+    {%endif%}
+</div>
+<hr>
+<div class="container-fluid">
+    <!-- Page Heading -->
+
+    <h1 class="h3 mb-4 text-gray-800">Applications In Progress</h1>
+</div>
+<div class="row">
+    {%if aipTournaments%} {%for tournament in aipTournaments%}
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <a href="/tournament/{{tournament.id}}">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">{%if tournament.type == "G&E"%} GROUP AND ELIMINATION {%else%} {{tournament.type}} {%endif%}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{tournament.name}}</div>
+                            <hr>
+                            <div>
+                                <p><strong>Teams applied: </strong> {{tournament.num_of_apps}}</p>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-trophy fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+    {%endfor%} {%else%}
+    <p>Currently there is no tournament that is open for applications.</p>
+    {%endif%}
+</div>
+<hr>
+<div class="container-fluid">
+    <!-- Page Heading -->
+
+    <h1 class="h3 mb-4 text-gray-800">Finished Tournaments</h1>
+</div>
+<div class="row">
+    {%if finishedTournaments%} {%for tournament in finishedTournaments%}
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <a href="/tournament/{{tournament.id}}">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">{%if tournament.type == "G&E"%} GROUP AND ELIMINATION {%else%} {{tournament.type}} {%endif%}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{tournament.name}}</div>
+                            <div>
+                                <hr>
+                                <p style="font-size: 20px;"><i class="fas fa-medal" style="color:gold" ;></i> <strong>WINNER:</strong> {{tournament.winner}}</p>
+                                <p style="font-size: 15px;"><i class="fas fa-medal" style="color:silver;"></i> <strong>SECOND PLACE:</strong> {{tournament.runner}}</p>
+                                <p style="font-size: 11px;"><i class="fas fa-medal" style="color:#cd7f32;"></i> <strong>THIRD PLACE:</strong> {{tournament.bronzer}}</p>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-trophy fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    {%endfor%} {%else%}
+    <p>Currently there is no tournament that is open for applications.</p>
+    {%endif%}
+</div>
+<hr> {%if moderating%}
+<div class="container-fluid">
+    <!-- Page Heading -->
+
+    <h1 class="h3 mb-4 text-gray-800">Moderator in</h1>
+</div>
+<div class="row">
+    {%for tournament in moderating%}
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <a href="/tournament/{{tournament.id}}">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">{%if tournament.type == "G&E"%} GROUP AND ELIMINATION {%else%} {{tournament.type}} {%endif%}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{tournament.name}}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-trophy fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+    {%endfor%}
+</div>
+{%endif%} {%endblock%}

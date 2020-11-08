@@ -1,0 +1,51 @@
+{%extends 'base.html'%} {%block content%} {%if match.team1 and match.team2%}
+<div class="results">
+    <div class="container" style="margin: auto !important;">
+
+        <div class=" row results_row ">
+            <div class="col ">
+                <div class="results_title_container text-center ">
+                    <div class="results_title">Match Info</div>
+                    <div class="results_subtitle ">{%if match.date%}{{match.date}}{%endif%}</div>
+                </div>
+                <div class="results_container d-flex flex-row align-items-start justify-content-start ">
+                    <div class="result text-right ">
+                        <div class="result_content d-flex flex-row align-items-end justify-content-start ">
+                            <div class="team_image d-flex flex-column align-items-start justify-content-end "><img src="{{match.team1.image.url}} " alt=" " style="width: 100%;"></div>
+                            <div class="text-center ">
+                                {%if match.isPlayed%}
+                                <div class="result_num ">{{match.team1_goals}}</div> {%else%}
+                                <div class="result_num ">-</div>{%endif%}
+                                <a href="/othTeam/{{match.team1.id}}">
+                                    <div class="result_team ">{{match.team1.name}}</div>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="result_text text-left">
+                            {%for scorer in team1Scorers%} <a href="/playerProfile/{{scorer.player.id}}">{{scorer.minute}}' {{scorer.player.name}} {{scorer.player.lastname}} </a><br> {%endfor%}
+                        </div>
+                    </div>
+                    <div class="result text-left ">
+                        <div class="result_content d-flex flex-row align-items-end justify-content-start ">
+                            <div class="text-center ">
+                                {%if match.isPlayed%}
+                                <div class="result_num ">{{match.team2_goals}}</div> {%else%}
+                                <div class="result_num ">-</div>{%endif%}
+                                <a href="/othTeam/{{match.team2.id}}">
+                                    <div class="result_team ">{{match.team2.name}}</div>
+                                </a>
+                            </div>
+                            <div class="team_image d-flex flex-column align-items-end justify-content-end "><img src="{{match.team2.image.url}}" alt=" " style="width: 100%;"></div>
+                        </div>
+                        <div class="result_text text-right ">
+                            {%for scorer in team2Scorers%} <a href="/playerProfile/{{scorer.player.id}}">{{scorer.minute}}' {{scorer.player.name}} {{scorer.player.lastname}}</a><br> {%endfor%}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{%else%}
+<h2>Info not available</h2>
+{%endif%} {%endblock%}

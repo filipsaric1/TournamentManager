@@ -1,0 +1,352 @@
+{%extends 'base.html'%} {%block content%}
+
+<!-- Begin Page Content -->
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <h1 class="h3 mb-4 text-gray-800">{{tournament.name}}</h1>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card shadow mb-4" style="margin-left: 5px;">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Info <i class="fa fa-trophy"></i></h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-6 mb-4">
+                        <div class="card bg-primary text-white shadow">
+                            <div class="card-body">
+                                Name
+                                <div class="text-white-50 small">{{tournament.name}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card bg-primary text-white shadow">
+                            <div class="card-body">
+                                Description
+                                <div class="text-white-50 small">{{tournament.description}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card bg-primary text-white shadow">
+                            <div class="card-body">
+                                Type
+                                <div class="text-white-50 small">{%if tournament.type == "G&E"%} Group and elimination {%else%} Elimination{%endif%}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card bg-primary text-white shadow">
+                            <div class="card-body">
+                                Start date
+                                <div class="text-white-50 small">{{tournament.start_date}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {%if tournament.type == "G&E"%}
+                    <div class="col-lg-6 mb-4">
+                        <div class="card bg-primary text-white shadow">
+                            <div class="card-body">
+                                Number of groups
+                                <div class="text-white-50 small">{{tournament.num_of_groups}}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 mb-4">
+                        <div class="card bg-primary text-white shadow">
+                            <div class="card-body">
+                                Promoted from each group
+                                <div class="text-white-50 small">{{tournament.teams_promoted}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {%endif%}{%if tournament.status == "FINISHED"%}
+                    <div class="text-center">
+                        <h1 class="h4 text-gray-900 mb-4">Rankings</h1>
+                    </div>
+                    <a href="/othTeam/{{winner.id}}" style="width:100%;">
+                        <div class="btn btn-facebook btn-block" style="height: 50px; line-height: 36px;  background-color:#d4af37" ;>
+                            <i class="fas fa-medal"></i> <span style="font-size: 20px">1. {{winner}}</span> <i class="fas fa-medal"></i>
+                        </div>
+                    </a>
+                    <a href="/othTeam/{{runner.id}}" style="width:100%;">
+                        <div class="btn btn-facebook btn-block" style="height: 50px; line-height: 36px; background-color:silver;">
+                            <span style="font-size: 20px">2. {{runner}}</span>
+                        </div>
+                    </a>
+                    <a href="/othTeam/{{bronzer.id}}" style="width:100%;">
+                        <div class="btn btn-facebook btn-block" style="height: 50px; line-height: 36px; background-color:#CD7F32;">
+                            <span style="font-size: 20px">3. {{bronzer}}</span>
+                        </div>
+                    </a>
+                    {%endif%}
+                </div>
+            </div>
+        </div>
+    </div>
+    {%if tournament.status == "AIP" %}
+    <div class="col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Apply for this tournament</h6>
+            </div>
+            <div class="card-body">
+                <p>You can apply your team for this tournament if you have more than 10 registered players in team. Applications are open until {{tournament.applications_open_until}}</p>
+                <p>Teams are created in dashboard option MyTeams > New Team.</p>
+                {%if flag == "false" and userCanApply%}
+                <strong>Apply your team for this tournamen:</strong><br>
+                <form method="POST" enctype='multipart/form-data' action='/apply/{{tournament.id}}'>
+                    <div class="col-sm-6 mb-3 mb-sm-0" style="padding-top: 10px !important;">
+                        {{appForm.team}} {% csrf_token %}
+                        <input type="submit" class="btn btn-primary" value="Apply team" style="margin-top: 10px !important;">
+                    </div>
+                </form>
+                {%endif%} {%if flag != "false"%}
+                <strong>You applied team {{flag}} for this tournament</strong> {%endif%} {%if not userCanApply %}
+                <hr>
+                <strong><h4>Applications are closed now. The tournament begins at {{tournament.start_date}}</h4></strong> {%endif%}
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endif %}
+<div class="col-lg-6" style="z-index: 1000; overflow-x: hidden;">
+    <div class="card shadow mb-4">
+        <!-- Card Header - Accordion -->
+        <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
+            <h6 class="m-0 font-weight-bold text-primary">Comments</h6>
+        </a>
+        <!-- Card Content - Collapse -->
+        <div class="collapse hide" id="collapseCardExample">
+            <div class="card-body" id="com" style="overflow: scroll; height: 400px; overflow-x: hidden;">
+                {%if tournament.status == "ACTIVE" or tournament.status == "AIP" %}
+                <form method="POST" class="user">
+                    <div class="form-group row">
+                        <div class="col-sm-6 mb-3 mb-sm-0">
+                            {{commentForm.text}}
+                        </div>
+                        <div class="col-sm-6">
+                            <input type="submit" style="margin-left: 30px;" value="Comment" class="btn btn-primary"> {%csrf_token%}
+                        </div>
+                    </div>
+                </form>
+                {%endif%}
+                <hr> {%for comment in comments%}
+                <div class="comment">
+                    <div class="container">
+                        <img src="{{comment.user.image.url}}" alt="Avatar" class="image" style="width:100%">
+                        <div class="middle">
+                            <a href="/user/{{comment.user.id}}">{{comment.user.username}}</a><br> {%if request.user.reputation != comment.user.reputation%} <a href="/repUp/{{comment.user.reputation.id}}/{{tournament.id}}"><i class="fas fa-arrow-alt-circle-up"></i></a>{%endif%}
+                            {{comment.user.reputation.points}} reputation
+                            <br>
+
+
+                        </div>
+                    </div>
+                    <span class="commentText"> {{comment.text}}</span>
+                </div>
+                <small style="margin-left: 5%; font-size: 11px;;">{{comment.time}}</small>
+                <hr> {%endfor%}
+            </div>
+        </div>
+    </div>
+</div>
+{%load static%} {%if tournament.status != "AIP" and tournament.type == "G&E" %} {%for group, parts in data.items%}
+<div class="card-body" style="width: 100%; overflow-x: hidden;">
+    <h3>GROUP {{group.name}}</h3>
+    <div class="table-responsive">
+        <table class="table table-bordered" id="dataTable" style="width: 99%;" cellspacing="0">
+            <tr>
+                <th>#</th>
+                <th class="left">Team</th>
+                <th>GP</th>
+                <th>W</th>
+                <th>L</th>
+                <th>D</th>
+                <th>GS</th>
+                <th>GA</th>
+                <th>GD</th>
+                <th>PTS</th>
+            </tr>{%for part in parts%}
+            <tr>
+                {% load templatefilters %} {% if forloop.counter|gt:tournament.teams_promoted%}
+                <td class="bg-gradient-danger" style="color: white;">{{forloop.counter}}.</td>
+                {%else%}
+                <td class="bg-gradient-primary" style="color: white;">{{forloop.counter}}.</td>
+                {%endif%}
+
+                <td class="left"><a href="/othTeam/{{part.team.id}}">{{part.team.name}}</td></a>
+                    <td>{{part.num_of_played_games}}</td>
+                    <td>{{part.num_of_victories}}</td>
+                    <td>{{part.num_of_defeats}}</td>
+                    <td>{{part.num_of_draws}}</td>
+                    <td>{{part.goals_scored}}</td>
+                    <td>{{part.goals_against}}</td>
+                    <td>{{part.goal_diff}}</td>
+                    <td><strong>{{part.points}}</strong></td>
+
+            </tr>
+            {%endfor%}
+        </table>
+
+        <div class="matches">
+            {% load templatefilters %} {%for match in matchlist|index:forloop.counter0%}
+            <div class="row bg-white align-items-center ml-0 mr-0 py-4 match-entry">
+                <div class="col-md-4 col-lg-4 mb-4 mb-lg-0">
+
+                    <div class="text-center text-lg-left">
+                        <div class="d-block d-lg-flex align-items-center">
+                            <div class="image image-small text-center mb-3 mb-lg-0 mr-lg-3">
+                                <img src="{{match.team1.image.url}}" alt="Image" class="img-fluid" onerror="this.onerror=null; this.src='https://media.contentapi.ea.com/content/dam/ea/fifa/fifa-20/common/fut-features/fut20-hero-medium-keyart-2x1-m.png.adapt.crop191x100.1200w.png'">
+                            </div>
+                            <div class="text order-1 w-100" style="background: none; color: black;">
+                                <h3 class="h5 mb-0 text-black"><a href="/othTeam/{{match.team1.id}}"> {{match.team1.name}}</a></h3>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-md-4 col-lg-4 text-center mb-4 mb-lg-0">
+                    <div class="d-inline-block">
+                        {% if match.isPlayed%}
+                        <a href="/match/{{match.id}}">
+                            <div class="bg-black py-2 px-4 mb-2 text-white d-inline-block rounded" style="background-color: black;"><span class="h5">{{match.team1_goals}} : {{match.team2_goals}} </span></div>
+                        </a>
+                        {%else%}
+                        <div class="bg-black py-2 px-4 mb-2 text-white d-inline-block rounded" style="background-color: black;"><span class="h5"> - </span></div>
+                        {% endif %}
+
+                        <p class="mb-0"><small class="text-uppercase text-black font-weight-bold">{{match.datetime}}</small></p>
+                        <p class="mb-0" onclick="document.getElementById('id{{match.id}}').style.display='block'" class="timedate" style="cursor: pointer;"><small class="text-uppercase text-black font-weight-bold">  {{match.date}} </small></p>
+                    </div>
+                </div>
+
+                <div class="col-md-4 col-lg-4 text-center text-lg-right">
+                    <div class="">
+                        <div class="d-block d-lg-flex align-items-center">
+                            <div class="image image-small ml-lg-3 mb-3 mb-lg-0 order-2">
+                                <img src="{{match.team2.image.url}}" alt="Image" class="img-fluid" onerror="this.onerror=null; this.src='https://media.contentapi.ea.com/content/dam/ea/fifa/fifa-20/common/fut-features/fut20-hero-medium-keyart-2x1-m.png.adapt.crop191x100.1200w.png'">
+                            </div>
+                            <div class="text order-1 w-100" style="background: none; color: black;">
+                                <h3 class="h5 mb-0 text-black"><a href="/othTeam/{{match.team2.id}}"> {{match.team2.name}}</a></h3>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <hr> {%endfor%}
+        </div>
+
+    </div>
+
+</div>
+{%endfor%} {%endif%} {%if elimGenerated and tournament.isGenerated%} {%load static%}
+<style>
+    *,
+     ::after,
+     ::before {
+        box-sizing: content-box;
+    }
+</style>
+<div class="card-body" style="width: 100%;">
+    <hr>
+    <section id="bracket" style="padding-left:20px;">
+        <div class="container2">
+            <div class="split split-one">
+                {%for round, matches in roundMatches.items %} {%if round.name != "bronze"%}
+                <div class="round round-{{forloop.counter}}{%if round.isCurrent%} current{%endif%}">
+                    <div class="round-details">{% if round.num_of_games == 1 and forloop.counter0 != 0 %} FINAL {%else%}ROUND {{forloop.counter}}{%endif%}<br/></div>
+                    {%for match in matches%}
+
+                    <ul class="matchup">
+                        <li class="date" class="timedate"><small class="text-uppercase text-black font-weight-bold"> {{match.date}} </small></li>
+                        <a href="/match/{{match.id}}">
+                            {%if match.isPlayed%}
+                            <li class="team team-top">{%if match.team1_goals > match.team2_goals%}<strong style="color:black;">{{match.team1}}</strong>{%else%}{{match.team1}}{%endif%}<span class="score">{{match.team1_goals}}</span></li>
+                            <li class="team team-bottom">{%if match.team2_goals > match.team1_goals%}<strong style="color:black;">{{match.team2}}</strong>{%else%}{{match.team2}}{%endif%}<span class="score">{{match.team2_goals}}</span></li>
+                            {%else%}
+                            <li class="team team-top">{{match.team1}}</strong><span class="score"></span></li>
+                            <li class="team team-bottom">{{match.team2}}<span class="score"></span></li>
+                            {%endif%}
+                        </a>
+                    </ul>
+
+                    {%endfor%}
+                </div>
+                {%else%}
+
+
+                <div class="round round-1">
+                    {%for match in matches%}
+                    <div class="champion" style="width: 100% !important;">
+                        <div class="final">
+                            <i class="fa fa-medal"></i>
+                            <div class="round-details">THIRD PLACE <br/></div>
+                            <ul class="matchup">
+                                <li class="date" onclick="document.getElementById('id{{match.id}}').style.display='block'" class="timedate" style="cursor: pointer;"><small class="text-uppercase text-black font-weight-bold"> {{match.date}}</small></li>
+                                <a href="/match/{{match.id}}">
+                                    <li class="team team-top">{%if match.team1_goals > match.team2_goals%}<strong style="color:black;">{{match.team1}}</strong>{%else%}{{match.team1}}{%endif%}<span class="score">{{match.team1_goals}}</span></li>
+                                    <li class="team team-bottom">{%if match.team2_goals > match.team1_goals%}<strong style="color:black;">{{match.team2}}</strong>{%else%}{{match.team2}}{%endif%}<span class="score">{{match.team2_goals}}</span></li>
+                                </a>
+                            </ul>
+                        </div>
+                    </div>
+                    {%endfor%}
+                </div>
+                {%endif%} {%endfor%}
+
+            </div>
+    </section>
+    </div>
+</div>
+<div class="col-lg-6">
+    <div class="card shadow mb-4" style="overflow-x: hidden !important;">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary"><i class="fa fa-futbol"></i> Top Scorers </h6>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" style="width: 99%;" cellspacing="0">
+                <tr>
+                    <th>#</th>
+                    <th class="left">Player</th>
+                    <th>Team</th>
+                    <th>Goals</th>
+                </tr>{%for scorer, score in scorerDict.items%}
+                <tr>
+                    <td><strong>{{forloop.counter}}.</strong></td>
+                    <td>{{scorer.name}} {{scorer.lastname}}</td>
+                    <td><a href="/othTeam/{{scorer.team.id}}">{{scorer.team.name}}</td></a>
+                        <td>{{score}}</td>
+                </tr>
+                {%endfor%}
+            </table>
+        </div>
+    </div>
+</div>
+
+
+{%endif%} {%if tournament.status == "AIP"%}
+<script>
+    function placeHolder() {
+        document.getElementById('id_team').className = "form-control";
+    }
+    window.addEventListener("load", placeHolder, false);
+</script>
+{%endif%} {%if tournament.status == "AIP" or tournament.status == "ACTIVE"%}
+<script>
+    function placeHolder() {
+        document.getElementById("id_text").placeholder = "Say something..";
+        document.getElementById('id_text').className = "form-control";
+    }
+    window.addEventListener("load", placeHolder, false);
+</script>
+{%endif%} {%endblock%}

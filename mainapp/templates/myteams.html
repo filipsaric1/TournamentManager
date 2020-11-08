@@ -1,0 +1,36 @@
+{% extends 'base.html' %} {%block content%}
+<div class="teamsMain">
+    {%for team in teams%}
+    <div class="team">
+        <img src="{{team.image.url}}">
+        <a href="{%url 'ownTeam' tid=team.id %}">
+            <span>{{team.name}}</span>
+        </a>
+        <a href="{%url 'deleteTeam' tid=team.id %}" class="sideBtn"><i class="fa fa-trash"></i></a>
+    </div>
+    {%endfor%}
+    <div style="display:flex; flex-direction: column;">
+        {%load static%}
+        <label class="teamLabel" for="tmchk"><img src="{% static "img/plus.png" %}"></label>
+        <input type="checkbox" class="teamChk" id="tmchk">
+        <div class="main" style="height: 470px; margin-left: 30px !important; height: 250px; display: none;">
+            <form method="POST" class="form1 " enctype='multipart/form-data'>
+                {{form.name}} {{form.description}}{{form.image}} <label id="id_filelabel1" for="id_image" style="display: inline-block; cursor: pointer;">choose image</label> {% csrf_token %}
+                <input type="submit" class="submit" align="center" value="Add">
+            </form>
+        </div>
+    </div>
+
+</div>
+
+
+<script>
+    function placeHolder() {
+        document.getElementById("id_name").placeholder = "Team name";
+        document.getElementById("id_description").placeholder = "Description";
+
+    }
+    window.addEventListener("load", placeHolder, false);
+</script>
+
+{%endblock%}

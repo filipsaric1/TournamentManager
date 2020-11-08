@@ -1,0 +1,19 @@
+<head>
+	<title>Change status</title>
+	{%load static%}
+	<!-- Custom fonts for this template-->
+    <link href="{% static "vendor/fontawesome-free/css/all.min.css"%}" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="{% static "css/bs-styles.css"%}" rel="stylesheet">
+</head>
+
+<body>
+    <div class="text-center">
+        <p class="lead text-gray-800 mb-5">Changing your password...</p>
+        <p class="text-gray-500 mb-0">{%if success%} You successfully changed your password.{%else%} Sorry, something went wrong. Try again. {%endif%}
+        </p>
+        <a href="/login">&larr; Login</a>
+    </div>
+</body>

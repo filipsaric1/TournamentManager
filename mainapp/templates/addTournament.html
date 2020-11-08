@@ -1,0 +1,120 @@
+{%extends 'base.html'%} {%block content%}
+<h1 class="h3 mb-4 text-gray-800">Create new tournament</h1>
+<div class="card o-hidden border-0 shadow-lg my-5">
+    <div class="card-body p-0">
+        <!-- Nested Row within Card Body -->
+        <div class="row">
+            <div class="col-lg-5 d-none d-lg-block">
+                <div class="card-body">
+                    If the tournament is of type G&E, it means that teams first play group stage. Each team plays every other team once. After group stage, single elimination is created. You select the number of teams promoted from each group, and also you select number
+                    of groups in tournament.
+                </div>
+                <div class="card-body">If the tournament is of type ELIMINATION, single-elimination bracket is generated after teams apply.</div>
+            </div>
+            <div class="col-lg-7">
+                <div class="p-5">
+                    <div class="text-center">
+                        <h1 class="h4 text-gray-900 mb-4">Enter tournament data</h1>
+                    </div>
+                    <form class="user" method="POST" enctype="multipart/form-data">
+                        <div class="form-group row">
+                            <div class="col-sm-6 mb-3 mb-sm-0">
+                                {{form.name}}
+                            </div>
+                            <div class="col-sm-6">
+                                {{form.description}}
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            {{form.type}}
+                        </div>
+                        <div class="form-group row">
+                            {{form.num_of_groups}}
+                        </div>
+                        <div class="form-group row">
+                            {{form.applications_open_until}}
+                        </div>
+
+                        <div class="form-group row">
+                            {{form.start_date}}
+                        </div>
+                        {% csrf_token %}
+                </div>
+                <input type="submit" class="btn btn-primary btn-user btn-block" value="Add Tournament">
+                </a>
+                <hr>
+                </form>
+                <hr>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    window.addEventListener('load', function() {
+        document.getElementById("id_name").className = "form-control";
+        document.getElementById("id_name").placeholder = "Name";
+        document.getElementById("id_description").className = "form-control";
+        document.getElementById("id_description").rows = "1";
+        document.getElementById("id_num_of_groups").className = "form-control";
+        document.getElementById("id_type").className = "form-control";
+        document.getElementById("id_type").placeholder = "Type";
+        document.getElementById("id_start_date").className = "form-control";
+        document.getElementById("id_applications_open_until").className = "form-control";
+    })
+    document.getElementById("id_start_date").type = "text";
+    document.getElementById("id_start_date").placeholder = "Start date";
+    var today = new Date().toISOString().split('T')[0];
+    document.getElementById('id_start_date').setAttribute('min', today);
+    document.getElementById("id_start_date").addEventListener('focus', function() {
+        document.getElementById("id_start_date").type = "date"
+    }, false)
+    document.getElementById("id_start_date").addEventListener('blur', function() {
+        document.getElementById("id_start_date").type = "text"
+    }, false)
+    document.getElementById("id_applications_open_until").type = "text";
+    document.getElementById("id_applications_open_until").placeholder = "Applications open until";
+    var today = new Date().toISOString().split('T')[0];
+    document.getElementById('id_applications_open_until').setAttribute('min', today);
+    document.getElementById("id_applications_open_until").addEventListener('focus', function() {
+        document.getElementById("id_applications_open_until").type = "date"
+    }, false)
+    document.getElementById("id_applications_open_until").addEventListener('blur', function() {
+        document.getElementById("id_applications_open_until").type = "text"
+    }, false)
+
+    function removeFields() {
+        var type = this.value
+        if (type == "ELIMINATION") {
+            console.log("jes");
+            document.getElementById("id_num_of_groups").style.display = 'none';
+            document.querySelector("label[for='id_num_of_groups']").style.display = 'none';
+            document.querySelector("label[for='id_teams_promoted']").style.display = 'none';
+        } else {
+            document.getElementById("id_num_of_groups").style.display = 'block';
+            document.querySelector("label[for='id_num_of_groups']").style.display = 'block';
+            document.querySelector("label[for='id_teams_promoted']").style.display = 'block';
+        }
+
+    }
+    document.getElementById("id_type").addEventListener('change', removeFields, false);
+    document.getElementById("id_type").addEventListener('load', removeFields, false);
+
+    function placeHolder() {
+        document.getElementById("id_name").placeholder = "Name";
+        document.getElementById("id_description").placeholder = "Description";
+        document.getElementById("id_num_of_groups").placeholder = "Number of groups";
+        document.getElementById("id_num_of_groups").setAttribute('min', 2);
+
+
+    }
+    window.addEventListener("load", placeHolder, false);
+
+    function startDate() {
+        var date = new Date(document.getElementById("id_applications_open_until").value).toISOString().split('T')[0]
+        document.getElementById("id_start_date").setAttribute('min', date);
+    }
+    document.getElementById("id_applications_open_until").addEventListener('change', startDate, false);
+</script>
+{%endblock%}

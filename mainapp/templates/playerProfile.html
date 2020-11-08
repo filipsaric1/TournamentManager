@@ -1,0 +1,146 @@
+{% extends 'base.html' %} {%block content%}
+<style>
+    .playerFormMain {
+        background-color: #FFFFFF;
+        width: 310px;
+        height: auto;
+        border-radius: 1.5em;
+        box-shadow: 0px 11px 35px 2px rgba(0, 0, 0, 0.14);
+        padding-bottom: 30px;
+        margin-left: 80px;
+        margin-top: 10px;
+        margin: 10px 0 0 60px;
+    }
+    
+    .submit {
+        cursor: pointer;
+        border-radius: 5em;
+        color: #fff;
+        background-color: dodgerblue;
+        border: 0;
+        padding-left: 40px;
+        padding-right: 40px;
+        padding-bottom: 10px;
+        padding-top: 10px;
+        font-family: 'Ubuntu', sans-serif;
+        margin-left: 35%;
+        font-size: 13px;
+        box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
+    }
+    
+    .submit:disabled {
+        cursor: none;
+    }
+    
+    #id_filelabel,
+    #id_name,
+    #id_lastname,
+    #id_number,
+    #id_pin {
+        width: 76%;
+        color: rgb(38, 50, 56);
+        font-weight: 700;
+        font-size: 14px;
+        letter-spacing: 1px;
+        background: rgba(136, 126, 126, 0.04);
+        padding: 10px 20px;
+        border: none;
+        border-radius: 20px;
+        outline: none;
+        box-sizing: border-box;
+        border: 2px solid rgba(0, 0, 0, 0.02);
+        margin-bottom: 50px;
+        margin-left: 46px;
+        text-align: center;
+        margin-bottom: 27px;
+        font-family: 'Ubuntu', sans-serif;
+    }
+    
+    #id_image {
+        display: none;
+    }
+    
+    p>strong {
+        margin-right: 6%;
+    }
+    
+    .col p {
+        margin: 2px 0 0 0;
+    }
+</style>
+<div class="card shadow mb-4" style="width: 70%; margin:auto;">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Info</h6>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col auto"><img src="{{player.image.url}}" style=" display: block;
+                margin-left: auto;
+                margin-right: auto;
+                width: 200px;">
+            </div>
+            <div class="col auto;">
+                <hr>
+                <strong style="font-size: 18px;"> PLAYER DATA </strong>
+                <hr>
+                <p><strong>Name: </strong> {{player.name}}</p>
+                <p><strong>Surname: </strong> {{player.lastname}}</p>
+                <p><strong>PIN: </strong> {{player.pin}}</p>
+                <p><strong>Number: </strong> {{player.number}}</p>
+                <p><strong>Team: </strong> {{player.team.name}}</p>
+                {%if request.user == player.team.owner or request.user.role == "A"%}
+                <p><a href="#" data-toggle="modal" data-target="#changePlayerData">
+                    update info
+                </a>
+                </p>
+                {%endif%}
+
+            </div>
+            <div class="col auto;">
+                <hr>
+                <strong style="font-size: 18px;"> PLAYER STATISTICS </strong>
+                <hr>
+                <p><i class="fas fa-calendar-alt"> </i> {{matches}} matches played </p>
+                <p><i class="fas fa-futbol"> </i> {{goals}} goals scored</p>
+
+
+            </div>
+
+        </div>
+    </div>
+</div>
+{%if request.user == player.team.owner or request.user.role == "A"%}
+<div class="modal fade" id="changePlayerData" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Change data</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">×</span>
+      </button>
+            </div>
+            <div style="padding: 5% 0 5% 0;">
+                <form method="POST" enctype='multipart/form-data'>
+                    <label id="id_filelabel" for="id_image" style="display: inline-block; cursor: pointer;">change image</label><img style="margin:0 0 8% 25%; max-width: 50%;;" src="{{player.image.url}}"><br> {{form.image}} {{form.name}} {{form.lastname}}
+                    {{form.pin}} {{form.number}} {%csrf_token%}
+                    <input type="submit" class="submit" align="center" value="Enter">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    function placeHolder() {
+        document.getElementById("id_name").placeholder = "Name";
+        document.getElementById("id_lastname").placeholder = "Surname";
+        document.getElementById("id_number").placeholder = "Number";
+        document.getElementById("id_pin").placeholder = "PIN";
+
+
+    }
+    window.addEventListener("load", placeHolder, false);
+</script>
+{%endif%} {%endblock%}

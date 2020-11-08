@@ -1,0 +1,154 @@
+{%extends 'base.html'%} {%block content%}
+<style>
+    .win {
+        background-color: rgb(73, 245, 20);
+        width: 30px;
+        height: 30px;
+        border-radius: 12px;
+        color: white;
+        padding: 5px 0 0 7px;
+        margin: 10px;
+    }
+    
+    .defeat {
+        background-color: rgb(255, 0, 0);
+        width: 30px;
+        height: 30px;
+        border-radius: 12px;
+        color: white;
+        padding: 5px 0 0 10px;
+        margin: 10px;
+    }
+    
+    .draw {
+        background-color: rgb(255, 187, 0);
+        width: 30px;
+        height: 30px;
+        border-radius: 12px;
+        color: white;
+        padding: 5px 0 0 10px;
+        margin: 10px;
+    }
+    
+    a:hover {
+        text-decoration: none;
+    }
+</style>
+<div class="container-fluid">
+
+    <!-- Page Heading -->
+    <h1 class="h3 mb-4 text-gray-800">{{team.name}} Players</h1>
+
+</div>
+<div class="row" style="padding-left: 10px;">
+    {%if not players%}
+    <div>
+        <p>No players registered for this team.</p>
+    </div>
+    <hr> {%endif%} {%for player in players%}
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <a href="/playerProfile/{{player.id}}">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">{{player.pin}}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{player.number}}, {{player.name}} {{player.lastname}}</div>
+                        </div>
+                        <div class="col-auto">
+                            <img src="{{player.image.url}}" style="width: 130px;">
+                        </div>
+                        <br>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+    {%endfor%}
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        Team Image
+    </div>
+    <div class="card-body" style="padding-left: 25%;">
+        <img src="{{team.image.url}}" style="max-width: 70%; border-radius: 10px;">
+    </div>
+</div>
+<div class="card mb-4">
+    <div class="card-header">
+        Team Stats
+    </div>
+    <div class="card-body">
+        <div class="card-body">
+            <hr>
+            <div class="row">
+
+                <strong style="font-size: 19px; margin-right: 50px;"> FORM </strong> {%for match in matches10%} {%if match.winner_id == team.id%}
+                <a href="/match/{{match.id}}">
+                    <div class="win">W</div>
+                </a> {%endif%} {%if match.team1_goals == match.team2_goals%}
+                <a href="/match/{{match.id}}">
+                    <div class="draw">D</div>
+                </a> {%endif%}{%if match.winner_id != team.id%}
+                <a href="/match/{{match.id}}">
+                    <div class="defeat">L</div>
+                </a> {%endif%} {%endfor%} {%if not matches%}
+                <small>Team has not participated in a match.</small> {%endif%} {%if trophies%}<strong style="font-size: 19px; margin-right: 50px; margin-left: 50px;"> TROPHIES </strong> {%for trophy in trophies%}<a href="/tournament/{{trophy.id}}"> {%if trophy.winner == team%}<i class="fas fa-medal fa-3x" style="color:gold; margin-left: 20px;" ;></i> {%endif%} {%if trophy.runner == team%}<i class="fas fa-medal fa-3x" style="color:silver; margin-left: 20px;" ;></i> {%endif%} {%if trophy.bronzer == team%}<i class="fas fa-medal fa-3x" style="color:#cd7f32; margin-left: 10px;" ></i> {%endif%} </a>{%endfor%}{%endif%}
+            </div>
+            <hr>
+
+        </div>
+    </div>
+</div>
+<div class="card mb-4">
+    <div class="card-header">
+        Last Matches
+    </div>
+    <div class="card-body" style="text-align: center;">
+        {%if not matches10%}
+        <small>Team has not participated in a match.</small> {%endif%} {%for match in matches10%}
+        <div class="row bg-white align-items-center ml-0 mr-0 py-4 match-entry">
+            <div class="col-md-4 col-lg-4 mb-4 mb-lg-0">
+                <div class="text-center text-lg-left">
+                    <div class="d-block d-lg-flex align-items-center">
+                        <div class="image image-small text-center mb-3 mb-lg-0 mr-lg-3">
+                            <img src="{{match.team1.image.url}}" alt="Image" class="img-fluid">
+                        </div>
+                        <div class="text order-1 w-100" style="background: none; color: black;">
+                            <a href="/othTeam/{{match.team1.id}}">
+                                <h3 class="h5 mb-0 text-black">{{match.team1.name}}</h3>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-4 text-center mb-4 mb-lg-0">
+                <div class="d-inline-block">
+                    <a href="/match/{{match.id}}">
+                        <div class="bg-black py-2 px-4 mb-2 text-white d-inline-block rounded" style="background-color: black;"><span class="h5">{{match.team1_goals}}:{{match.team2_goals}} </span></div>
+                    </a>
+                    <p class="mb-0"><small class="text-uppercase text-black font-weight-bold">{{match.datetime}}</small></p>
+                    <p class="mb-0" onclick="document.getElementById('id{{match.id}}').style.display='block'" class="timedate" style="cursor: pointer;"><small class="text-uppercase text-black font-weight-bold">  {{match.date}} </small></p>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-lg-4 text-center text-lg-right">
+                <div class="">
+                    <div class="d-block d-lg-flex align-items-center">
+                        <div class="image image-small ml-lg-3 mb-3 mb-lg-0 order-2">
+                            <img src="{{match.team2.image.url}}" alt="Image" class="img-fluid">
+                        </div>
+                        <div class="text order-1 w-100" style="background: none; color: black;">
+                            <a href="/othTeam/{{match.team2.id}}">
+                                <h3 class="h5 mb-0 text-black">{{match.team2.name}}</h3>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr> {%endfor%}
+    </div>
+</div>
+{%endblock%}

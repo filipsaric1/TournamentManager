@@ -1,0 +1,53 @@
+{%extends 'base.html'%} {%block content%}
+          <h1 class="h3 mb-4 text-gray-800">Create Team</h1>
+            <div class="card o-hidden border-0 shadow-lg my-5">
+              <div class="card-body p-0">
+                <!-- Nested Row within Card Body -->
+                <div class="row">
+                  <div class="col-lg-5 d-none d-lg-block">
+                    <div class="card-body">
+                      After you create a team, it will become visible under MyTeams in main menu. You will be able to add players to your team and apply your team to tournaments.
+                    </div>
+                    <div class="card-body"><strong>NOTE:</strong> you are required to have at least 10 players in your team to apply to tournaments.</div>
+                  </div>
+                  <div class="col-lg-7">
+                    <div class="p-5">
+                      <div class="text-center">
+                        <h1 class="h4 text-gray-900 mb-4">Enter team info</h1>
+                      </div>
+                      <form class="user" method="POST" enctype="multipart/form-data">
+                        <div class="form-group row">
+                          <div class="col-sm-6 mb-3 mb-sm-0">
+                              {{form.name}}
+                          </div>
+                          <div class="col-sm-6 mb-3 mb-sm-0">
+                            {{form.image}}
+                            <label id="label" for="id_image">Select Image</label>
+                            
+                          </div>
+                        
+                          {% csrf_token %}
+                        </div>
+                        <input type="submit" class="btn btn-primary btn-user btn-block" value="Create Team">
+                        </a>
+                        <hr>
+                      </form>
+                      <hr>
+                      
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>      
+  <script>
+    window.addEventListener('load', function() {
+         document.getElementById("id_name").className = "form-control";
+         document.getElementById("id_name").placeholder = "Name";
+         document.getElementById("label").className = "form-control";
+         document.getElementById("label").placeholder = "Image";
+         document.getElementById("id_image").style.display = "None";
+         
+     
+    } )
+    </script>
+{%endblock%}

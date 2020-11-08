@@ -1,0 +1,595 @@
+{%extends 'base.html'%} {%block content%}
+<style>
+    @keyframes load {
+        0% {
+            opacity: 0.08;
+            /*         font-size: 10px; */
+            /* 				font-weight: 400; */
+            filter: blur(5px);
+            letter-spacing: 3px;
+        }
+        100% {
+            /*         opacity: 1; */
+            /*         font-size: 12px; */
+            /* 				font-weight:600; */
+            /* 				filter: blur(0); */
+        }
+    }
+    
+    .animate {
+        display: none;
+        position: fixed;
+        left: 40%;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        margin: auto;
+        /* 	width: 350px; */
+        /* 	font-size:26px; */
+        font-family: Helvetica, sans-serif, Arial;
+        animation: load 1.2s infinite 0s ease-in-out;
+        animation-direction: alternate;
+        text-shadow: 0 0 1px white;
+        color: black;
+        z-index: 9999;
+    }
+</style>
+<h2 class="animate" id="generateMatchesLoad">Generating matches...</h2>
+<h2 class="animate" id="generateRound">Generating next round...</h2>
+<h2 class="animate" id="generateTournamentLoad">Generating tournament...</h2>
+<h2 class="animate" id="generateEliminationLoad">Generating elimination phase...</h2>
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <h1 class="h3 mb-4 text-gray-800">{{tournament.name}}</h1>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Tournament Info <i class="fa fa-trophy"></i></h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-6 mb-4">
+                        <div class="card bg-primary text-white shadow">
+                            <div class="card-body">
+                                Name
+                                <div class="text-white-50 small">{{tournament.name}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card bg-primary text-white shadow">
+                            <div class="card-body">
+                                Description
+                                <div class="text-white-50 small">{{tournament.description}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card bg-primary text-white shadow">
+                            <div class="card-body">
+                                Type
+                                <div class="text-white-50 small">{%if tournament.type == "G&E"%} Group and elimination {%else%} Elimination{%endif%}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card bg-primary text-white shadow">
+                            <div class="card-body">
+                                Start date
+                                <div class="text-white-50 small">{{tournament.start_date}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {%if tournament.type == "G&E"%}
+                    <div class="col-lg-6 mb-4">
+                        <div class="card bg-primary text-white shadow">
+                            <div class="card-body">
+                                Number of groups
+                                <div class="text-white-50 small">{{tournament.num_of_groups}}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 mb-4">
+                        <div class="card bg-primary text-white shadow">
+                            <div class="card-body">
+                                Promoted from each group
+                                <div class="text-white-50 small">{{tournament.teams_promoted}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {%endif%} {%if tournament.status == "FINISHED"%}
+                    <div class="text-center">
+                        <h1 class="h4 text-gray-900 mb-4">Rankings</h1>
+                    </div>
+                    <a href="/othTeam/{{winner.id}}" style="width:100%;">
+                        <div class="btn btn-facebook btn-block" style="height: 50px; line-height: 36px;  background-color:#d4af37" ;>
+                            <i class="fas fa-medal"></i> <span style="font-size: 20px">1. {{winner}}</span> <i class="fas fa-medal"></i>
+                        </div>
+                    </a>
+                    <a href="/othTeam/{{runner.id}}" style="width:100%;">
+                        <div class="btn btn-facebook btn-block" style="height: 50px; line-height: 36px; background-color:silver;">
+                            <span style="font-size: 20px">2. {{runner}}</span>
+                        </div>
+                    </a>
+                    <a href="/othTeam/{{bronzer.id}}" style="width:100%;">
+                        <div class="btn btn-facebook btn-block" style="height: 50px; line-height: 36px; background-color:#CD7F32;">
+                            <span style="font-size: 20px">3. {{bronzer}}</span>
+                        </div>
+                    </a>
+                    {%endif%} {%if tournament.status == "ACTIVE" and request.user == tournament.creator%}
+                    <div class="text-center">
+                        <h1 class="h4 text-gray-900 mb-4">Moderators</h1>
+                    </div>
+                    <div class="card-body">
+                        <p>You can add moderators for this tournament. Moderator is able to manage everything in this tournament except generating and finishing tournament.</p>
+                        <p></p>
+                        <button class="btn btn-primary btn-icon-split" onclick="document.getElementById('mod').style.display='block'">
+                            <span class="icon text-white-50">
+                        </span>
+                            <span class="text" style="background: inherit;">Set Moderator</span>
+                    </button>
+                        <div class="w3-container" style="padding-left:0px !important; padding-right: 50px !important;border-right: 1px solid #f2e3e3; align-items: center;">
+                            <div id="mod" class="w3-modal">
+                                <div class="w3-modal-content" style="border-radius: 20px !important;">
+                                    <div class="w3-container" style="padding: 20px 70px 10px 70px !important;">
+                                        <span onclick="document.getElementById('mod').style.display='none'" class="w3-button w3-display-topright" style="border-radius:0 10px 0 0;">&times;</span>
+                                        <form method="POST" enctype='multipart/form-data' action='/setMod/{{tournament.id}}'>
+                                            {{moderatorPicker.user}} {% csrf_token %}
+                                            <input type="submit" class="btn btn-primary" value="Select" style="margin-top: 10px;">
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {%if mods%}
+                    <p><small>Current mods: {%for mod in mods%} {{mod.username}}{%endfor%}</small></p>{%endif%} {%endif%}
+                </div>
+            </div>
+        </div>
+    </div>
+    {%if tournament.status == "AIP" %}
+    <div class="col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Generate Tournament</h6>
+            </div>
+            <div class="card-body">
+                <p><b>{{tournament.num_of_apps}}</b> teams applied for this tournament. At {{tournament.start_date}} {% if tournament.type == "G&E"%} you will be able to generate groups and matches. {%else%} you will be able to generate tournament bracket.
+                    {%endif%}
+                </p>
+                {%if tournament.num_of_apps > 4%} {%else%}
+                <p>Sorry, at least 4 teams are required to generate a tournament.{%endif%}</p>
+                {%if not tournament.isGenerated and tournament.num_of_apps > 4 and tournamentGenerable and tournament.type == "G&E" %}
+                <a href="{%url 'generateTournament' tid=tournament.id %}" class="btn btn-primary btn-icon-split">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-flag"></i>
+                    </span>
+                    <span class="text" style="background: inherit;">Generate tournament</span>
+                </a>
+                {% endif %} {%if not tournament.isGenerated and tournament.num_of_apps > 3 and tournament.type == "ELIMINATION" and tournamentGenerable%}
+                <a href="{%url 'generateElimination' tid=tournament.id %}" class="btn btn-primary btn-icon-split">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-flag"></i>
+                    </span>
+                    <span class="text" style="background: inherit;">Generate tournament</span>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {%endif%} {%if tournament.status == "ACTIVE" %}
+    <div class="col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Match Dates</h6>
+            </div>
+            <div class="card-body" style="padding-right: 80px;">
+                <p>You can add new matchdates right here. After you create a new matchdate (date + time), you will be able to set a match to be played at certain datetime. </p>
+
+                <form class="matchDateForm" method="POST" enctype='multipart/form-data' action='/newMatchDate/{{tournament.id}}'>
+                    {{form}} {% csrf_token %}
+                    <input type="submit" value="Add" class="btn btn-primary">
+                </form>
+                <hr>
+                <p>Match can't be played if matchdate is not set.</p>
+                <p>You won't be able to manage match until match day. Match is opened for managing 2 hours after match date and time.</p>
+
+            </div>
+        </div>
+    </div>
+    {%endif%}
+</div>
+
+{%if tournament.type == "G&E"%} {%load static%}
+<div style="width: 100%"> {%for group, parts in data.items%}
+    <div class="card-body" style="width: 100%; overflow-x: hidden;">
+        <h3>GROUP {{group.name}}</h3>{% if not group.matches_generated %}
+        <a href="{%url 'groupMatchMaking' gid=group.id %}" class="btn btn-primary btn-icon-split" name="generateGroupMatches">
+            <span class="icon text-white-50">
+            <i class="fas fa-flag"></i>
+        </span>
+            <span class="text" style="background: inherit;">Generate Matches</span>
+        </a>{%endif%}
+        <div class="table-responsive" style="overflow-x: hidden !important; margin-top:10px;">
+            <table class="table table-bordered" id="dataTable" width="100%" style=" width: 99%;" cellspacing="0">
+                <tr>
+                    <th>#</th>
+                    <th class="left">Team</th>
+                    <th>GP</th>
+                    <th>W</th>
+                    <th>L</th>
+                    <th>D</th>
+                    <th>GS</th>
+                    <th>GA</th>
+                    <th>GD</th>
+                    <th>PTS</th>
+                </tr>{%for part in parts%}
+                <tr>
+                    {% load templatefilters %} {% if forloop.counter|gt:tournament.teams_promoted%}
+                    <td class="bg-gradient-danger" style="color: white;">{{forloop.counter}}.</td>
+                    {%else%}
+                    <td class="bg-gradient-primary" style="color: white;">{{forloop.counter}}.</td>
+                    {%endif%}
+
+                    <td class="left"><a href="/othTeam/{{part.team.id}}">{{part.team.name}}</td></a>
+                        <td>{{part.num_of_played_games}}</td>
+                        <td>{{part.num_of_victories}}</td>
+                        <td>{{part.num_of_defeats}}</td>
+                        <td>{{part.num_of_draws}}</td>
+                        <td>{{part.goals_scored}}</td>
+                        <td>{{part.goals_against}}</td>
+                        <td>{{part.goal_diff}}</td>
+                        <td><strong>{{part.points}}</strong></td>
+
+                </tr>
+                {%endfor%}
+            </table>
+
+            <div class="matches">
+                {% load templatefilters %} {%for match in matchlist|index:forloop.counter0%}
+                <div class="row bg-white align-items-center ml-0 mr-0 py-4 match-entry" id="{{match.id}}">
+                    <div class="col-md-4 col-lg-4 mb-4 mb-lg-0">
+
+                        <div class="text-center text-lg-left">
+                            <div class="d-block d-lg-flex align-items-center">
+                                <div class="image image-small text-center mb-3 mb-lg-0 mr-lg-3">
+                                    <img src="{{match.team1.image.url}}" alt="Image" class="img-fluid" onerror="this.onerror=null; this.src='https://media.contentapi.ea.com/content/dam/ea/fifa/fifa-20/common/fut-features/fut20-hero-medium-keyart-2x1-m.png.adapt.crop191x100.1200w.png'">
+                                </div>
+                                <div class="text order-1 w-100" style="background: none; color: black;">
+                                    <h3 class="h5 mb-0 text-black"><a href="/othTeam/{{match.team1.id}}"> {{match.team1.name}}</a></h3>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-4 col-lg-4 text-center mb-4 mb-lg-0">
+                        <div class="d-inline-block">
+                            <a href="/match/{{match.id}}">
+                                <div class="bg-black py-2 px-4 mb-2 text-white d-inline-block rounded" style="background-color: black;"><span class="h5">{% if match.isPlayed%}{{match.team1_goals}}:{{match.team2_goals}} {%else%} - {%endif%} </span></div>
+                            </a>
+                            <p class="mb-0" {%if not match.isPlayed%}onclick="document.getElementById('id{{match.id}}').style.display='block'" style="cursor: pointer;" {%endif%} class="timedate"><small class="text-uppercase text-black font-weight-bold">{%if not match.date%} SET MATCHDATE {%else%} {{match.date}} {%endif%}</small></p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-lg-4 text-center text-lg-right">
+                        <div class="">
+                            <div class="d-block d-lg-flex align-items-center">
+                                <div class="image image-small ml-lg-3 mb-3 mb-lg-0 order-2">
+                                    <img src="{{match.team2.image.url}}" alt="Image" class="img-fluid" onerror="this.onerror=null; this.src='https://media.contentapi.ea.com/content/dam/ea/fifa/fifa-20/common/fut-features/fut20-hero-medium-keyart-2x1-m.png.adapt.crop191x100.1200w.png'">
+                                </div>
+                                <div class="text order-1 w-100" style="background: none; color: black;">
+                                    <h3 class="h5 mb-0 text-black"><a href="/othTeam/{{match.team2.id}}"> {{match.team2.name}}</a></h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="w3-container" style="padding-left:0px !important; padding-right: 50px !important;border-right: 1px solid #f2e3e3; align-items: center;">
+                    <div id="id{{match.id}}" class="w3-modal">
+                        <div class="w3-modal-content" style="border-radius: 20px !important;">
+                            <div class="w3-container" style="padding: 20px 70px 10px 70px !important;">
+                                <span onclick="document.getElementById('id{{match.id}}').style.display='none'" class="w3-button w3-display-topright" style="border-radius:0 10px 0 0;">&times;</span>
+                                <form method="POST" enctype='multipart/form-data' action='/setMatchDate/{{match.id}}'>
+                                    {{datePickerForm}} {% csrf_token %}
+                                    <input type="submit" class="btn btn-primary" value="Select" style="margin-bottom: 10px;">
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr> {%endfor%}
+
+
+            </div>
+        </div>
+    </div>
+    {%endfor%}
+</div> {%endif%} {%if elimGenerated and tournament.isGenerated%} {%load static%}
+<style>
+    *,
+     ::after,
+     ::before {
+        box-sizing: content-box;
+    }
+</style>
+<div class="card-body" style="width: 100%;">
+    {% if firstRoundFlag%}
+    <a href="/generateNextRound/{{tournament.id}}" class="btn btn-primary btn-icon-split">
+        <span class="icon text-white-50">
+          <i class="fas fa-flag"></i>
+        </span>
+        <span class="text" style="background: inherit !important;">Generate Next Round</span>
+    </a>
+    {%endif%} {% if not firstRoundFlag and matchesPlayedFlag and not finalFlag%}
+    <a href="/generateNextRound/{{tournament.id}}" class="btn btn-primary btn-icon-split">
+        <span class="icon text-white-50">
+          <i class="fas fa-flag"></i>
+        </span>
+        <span class="text" style="background: inherit !important;">Generate Next Round</span>
+    </a>
+    {%endif%} {% if finalFlag and bronzePlayed and matchesPlayedFlag and tournament.status == "ACTIVE" and userCanFinish%}
+    <a href="/finishTournament/{{tournament.id}}" class="btn btn-success btn-icon-split">
+        <span class="icon text-white-50">
+          <i class="fas fa-check"></i>
+        </span>
+        <span class="text" style="background: inherit !important;">Finish Tournament</span>
+    </a>
+    {%endif%}
+    <hr>
+    <section id="bracket" style="padding-left:20px;">
+        <div class="container2">
+            <div class="split split-one">
+                {%for round, matches in roundMatches.items %} {%if round.name != "bronze"%}
+                <div class="round round-{{forloop.counter}}{%if round.isCurrent%} current{%endif%}" id="{{round.id}}">
+                    <div class="round-details">{% if round.num_of_games == 1 and forloop.counter0 != 0 %} FINAL {%else%}ROUND {{forloop.counter}}{%endif%}<br/></div>
+                    {%for match in matches%}
+
+                    <ul class="matchup" id="{{match.id}}">
+                        <li class="date" {%if round.isCurrent and not match.isPlayed%}onclick="document.getElementById('id{{match.id}}').style.display='block'" style="cursor: pointer;" {%endif%} class="timedate"><small class="text-uppercase text-black font-weight-bold">{%if not match.date and round.isCurrent%} SET MATCHDATE {%else%} {{match.date}} {%endif%}</small></li>
+                        <a href="/match/{{match.id}}">
+                            {%if match.isPlayed%}
+                            <li class="team team-top">{%if match.team1_goals > match.team2_goals%}<strong style="color:black;">{{match.team1}}</strong>{%else%}{{match.team1}}{%endif%}<span class="score">{{match.team1_goals}}</span></li>
+                            <li class="team team-bottom">{%if match.team2_goals > match.team1_goals%}<strong style="color:black;">{{match.team2}}</strong>{%else%}{{match.team2}}{%endif%}<span class="score">{{match.team2_goals}}</span></li>
+                            {%else%}
+                            <li class="team team-top">{{match.team1}}<span class="score"></span></li>
+                            <li class="team team-bottom">{{match.team2}}<span class="score"></span></li>
+                            {%endif%}
+                        </a>
+                        <div class="w3-container" style="padding-left:0px !important; padding-right: 0px !important;border-right: 1px solid #f2e3e3; align-items: center;">
+                            <div id="id{{match.id}}" class="w3-modal">
+                                <div class="w3-modal-content" style="border-radius: 20px !important;">
+                                    <div class="w3-container" style="padding: 20px 70px 10px 70px !important;">
+                                        <span onclick="document.getElementById('id{{match.id}}').style.display='none'" class="w3-button w3-display-topright" style="border-radius:0 10px 0 0;">&times;</span>
+                                        <form method="POST" enctype='multipart/form-data' action='/setMatchDate/{{match.id}}'>
+                                            {{datePickerForm}} {% csrf_token %}
+                                            <input type="submit" class="btn btn-primary" value="Select" style="margin-bottom: 10px;">
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </ul>
+
+                    {%endfor%}
+                </div>
+                {%else%}
+
+
+                <div class="round round-1">
+                    {%for match in matches%}
+                    <div class="champion" style="width: 100% !important;" id="{{match.id}}">
+                        <div class="final">
+                            <i class="fa fa-medal"></i>
+                            <div class="round-details">THIRD PLACE <br/></div>
+                            <ul class="matchup">
+                                <li class="date" {%if not match.isPlayed%} onclick="document.getElementById('id{{match.id}}').style.display='block'" style="cursor: pointer;" {%endif%} class="timedate"><small class="text-uppercase text-black font-weight-bold">{%if not match.date%} SET MATCHDATE {%else%} {{match.date}} {%endif%}</small></li>
+                                <a href="/match/{{match.id}}">
+                                    <li class="team team-top">{%if match.team1_goals > match.team2_goals%}<strong style="color:black;">{{match.team1}}</strong>{%else%}{{match.team1}}{%endif%}<span class="score">{{match.team1_goals}}</span></li>
+                                    <li class="team team-bottom">{%if match.team2_goals > match.team1_goals%}<strong style="color:black;">{{match.team2}}</strong>{%else%}{{match.team2}}{%endif%}<span class="score">{{match.team2_goals}}</span></li>
+                                </a>
+                                <div class="w3-container" style="padding-left:0px !important; padding-right: 0px !important;border-right: 1px solid #f2e3e3; align-items: center;">
+                                    <div id="id{{match.id}}" class="w3-modal">
+                                        <div class="w3-modal-content" style="border-radius: 20px !important;">
+                                            <div class="w3-container" style="padding: 20px 70px 10px 70px !important;">
+                                                <span onclick="document.getElementById('id{{match.id}}').style.display='none'" class="w3-button w3-display-topright" style="border-radius:0 10px 0 0;">&times;</span>
+                                                <form method="POST" enctype='multipart/form-data' action='/setMatchDate/{{match.id}}'>
+                                                    {{datePickerForm}} {% csrf_token %}
+                                                    <input type="submit" class="btn btn-primary" value="Select" style="margin-bottom: 10px;">
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ul>
+                        </div>
+                    </div>
+                    {%endfor%}
+                </div>
+                {%endif%} {%endfor%}
+
+            </div>
+    </section>
+
+    </div>
+    {%endif%}
+    <div class="row">
+        {%if tournament.status == "ACTIVE" or tournament.status == "FINISHED"%}
+        <div class="col-lg-6" style="max-width: 100%;">
+            <div class="card shadow mb-4" style="width: 100%;">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary"> <i class="fa fa-futbol"></i> Top Scorers </h6>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="dataTable" style="width:99%;" cellspacing="0">
+                        <tr>
+                            <th>#</th>
+                            <th class="left">Player</th>
+                            <th>Team</th>
+                            <th>Goals</th>
+                        </tr>{%for scorer, score in scorerDict.items%}
+                        <tr>
+                            <td><strong>{{forloop.counter}}.</strong></td>
+                            <td>{{scorer.name}} {{scorer.lastname}}</td>
+                            <td><a href="/othTeam/{{scorer.team.id}}">{{scorer.team.name}}</td></a>
+                                <td>{{score}}</td>
+                        </tr>
+                        {%endfor%}
+                    </table>
+                </div>
+            </div>
+        </div>
+        {%endif%} {%if comments.length != 0 %}
+        <div class="col-lg-6" style="max-width: 100%;" id="commentsDiv">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Accordion -->
+                <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
+                    <h6 class="m-0 font-weight-bold text-primary">Comments</h6>
+                </a>
+                <!-- Card Content - Collapse -->
+                <div class="collapse show" id="collapseCardExample">
+                    <div class="card-body" id="com" style="overflow: scroll; overflow-x: hidden; height: 400px;">
+                        {% if tournament.status == "ACTIVE" or tournament.status == "AIP" %}
+                        <form method="POST" class="user">
+                            <div class="form-group row">
+                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                    {{commentForm.text}}
+                                </div>
+                                <div class="col-sm-6">
+                                    <input type="submit" style="margin-left: 30px;" value="Comment" class="btn btn-primary"> {%csrf_token%}
+                                </div>
+                            </div>
+                        </form>
+                        {%endif%}
+                        <hr> {%for comment in comments%}
+                        <div class="comment">
+                            <div class="container">
+                                <img src="{{comment.user.image.url}}" alt="Avatar" class="image" style="width:100%">
+                                <div class="middle">
+                                    <a href="/user/{{comment.user.id}}">{{comment.user.username}}</a><br> {%if request.user.reputation != comment.user.reputation%} <a href="/repUp/{{comment.user.reputation.id}}/{{tournament.id}}"><i class="fas fa-arrow-alt-circle-up"></i></a>{%endif%}
+                                    {{comment.user.reputation.points}} reputation
+                                    <br>
+                                    <a href="/deleteComment/{{comment.id}}"><i class="fas fa-trash"></i></a>
+
+
+                                </div>
+                            </div>
+                            <span class="commentText"> {{comment.text}}</span>
+                        </div>
+                        <small style="margin-left: 5%; font-size: 11px;;">{{comment.time}}</small>
+                        <hr> {%endfor%}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {%endif%} {%if tournament.status == 'ACTIVE' and tournament.type == 'G&E' and not elimGenerated %}
+        <div class="col-lg-6">
+            <div class="card shadow mb-4" style="margin-left: 5px;">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        Generate Elimination </h6>
+                </div>
+
+                <div class="card-body">
+                    {%if groupStageFinished%}
+                    <p>Grop stage is finished. Now you can generate elimination phase of this tournament. First {{tournament.teams_promoted}} teams from each group go to elimination phase. First ranked teams can't face other first ranked teams in first round.
+                        Teams from the same group can't be faced in first round of elimination phase.
+                    </p>
+                    <a href="{%url 'generateElimination' tid=tournament.id %}" class="btn btn-primary btn-icon-split" id="generateElimination">
+                        <span class="icon text-white-50">
+                        <i class="fas fa-flag"></i>
+                    </span>
+                        <span class="text" style="background: inherit;">Generate Elimination Phase</span>
+                    </a>
+                    {%else%}
+                    <p>When all matches in all groups are played, you will be able to generate elimination phase of this tournament.</p>
+                    {%endif%}
+                </div>
+            </div>
+        </div>
+
+        {%endif%}
+    </div>
+
+    {%if tournament.status != "AIP" and request.user.role == "C" or request.user.role == "A"%}
+
+    <script>
+        function changeToTime() {
+            var dates = document.querySelectorAll('select[id=id_date]')
+            for (var date of dates) {
+                date.style.margin = '0 0 10px 0';
+                date.className = 'form-control';
+                date.required = true;
+            }
+        }
+
+
+        window.addEventListener("load", changeToTime, false);
+    </script>
+    {%endif%} {%if tournament.status == "ACTIVE"%}
+    <script>
+        function changeToTime() {
+            document.getElementById('id_time').type = 'time';
+            document.getElementById('id_date').className = 'form-control';
+            var today = new Date().toISOString().split('T')[0];
+            document.getElementById('id_date').setAttribute('min', today);
+            document.getElementById('id_time').value = '20:00';
+            document.getElementById('id_time').className = 'form-control';
+            document.getElementById('id_time').style.margin = '0 0 10px 0';
+        }
+        window.addEventListener("load", changeToTime, false);
+        generateMatchesButtons = document.getElementsByName("generateGroupMatches");
+        for (var button of generateMatchesButtons) {
+            button.addEventListener("click", function(e) {
+                e.preventDefault();
+                var goTo = this.getAttribute("href");
+                document.getElementById("generateMatchesLoad").style.display = "flex";
+                setTimeout(function() {
+                    window.location = goTo;
+
+                }, 2000)
+            }, false)
+        }
+    </script>
+    {%endif%} {%if tournament.status != "FINISHED"%}
+    <script>
+        function placeHolder() {
+            document.getElementById("id_text").placeholder = "Say something..";
+            document.getElementById('id_text').className = "form-control";
+
+        }
+        window.addEventListener("load", placeHolder, false);
+    </script>
+    {%endif%} {%if tournament.status == "AIP"%}
+    <script>
+        document.getElementById("generateTournament").addEventListener("click", function(e) {
+            e.preventDefault();
+            var goTo = this.getAttribute("href");
+            document.getElementById("generateTournamentLoad").style.display = "flex";
+            setTimeout(function() {
+                window.location = goTo;
+
+            }, 2000)
+        }, false)
+    </script>
+    {%endif%} {%if groupStageFinished%}
+    <script>
+        if (document.getElementById("generateElimination") != null) {
+            document.getElementById("generateElimination").addEventListener("click", function(e) {
+                e.preventDefault();
+                var goTo = this.getAttribute("href");
+                document.getElementById("generateEliminationLoad").style.display = "flex";
+                setTimeout(function() {
+                    window.location = goTo;
+
+                }, 2000)
+            }, false)
+
+        }
+    </script>
+    {%endif%}{%endblock%}
